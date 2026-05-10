@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Admin · Fênix Flats</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --gold:#C9A84C;--dark:#0f0f0f;--dark2:#1a1a1a;--dark3:#242424;--dark4:#2e2e2e;
+  --text:#f0ead8;--text-muted:#9a9080;--text-dim:#5a544a;
+  --green:#2ecc71;--green-dark:#1a7a3a;--red:#e74c3c;--blue:#5b8dee;
+  --radius:12px;--radius-sm:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--dark);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:300;min-height:100vh}
+.header{background:var(--dark2);border-bottom:1px solid #222;padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.header-left{display:flex;align-items:center;gap:12px}
+.logo{width:40px;height:40px;border-radius:var(--radius-sm);background:var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:14px;font-weight:500;color:#111;flex-shrink:0}
+.header h1{font-family:'Playfair Display',serif;font-size:18px;font-weight:500}
+.header p{font-size:12px;color:var(--text-muted)}
+.hbtn{background:transparent;border:1px solid #444;color:var(--text-muted);font-family:'DM Sans',sans-serif;font-size:12px;padding:6px 14px;border-radius:20px;cursor:pointer;transition:all .15s}
+.hbtn:hover{border-color:var(--gold);color:var(--gold)}
+.tabs{display:flex;gap:0;border-bottom:1px solid #222;background:var(--dark2);padding:0 1.5rem}
+.tab{padding:.875rem 1.25rem;font-size:13px;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;font-family:'DM Sans',sans-serif;background:none;border-top:none;border-left:none;border-right:none}
+.tab:hover{color:var(--text)}
+.tab.ativo{color:var(--gold);border-bottom-color:var(--gold)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;padding:1.25rem 1.5rem;max-width:1100px;margin:0 auto}
+.stat{background:var(--dark2);border:1px solid #222;border-radius:var(--radius-sm);padding:.875rem 1rem}
+.stat-val{font-size:22px;font-weight:500;color:var(--gold)}
+.stat-label{font-size:11px;color:var(--text-muted);margin-top:2px;letter-spacing:.04em;text-transform:uppercase}
+.filtros{padding:.75rem 1.5rem;max-width:1100px;margin:0 auto;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.fbtn{background:var(--dark3);border:1px solid #333;border-radius:20px;color:var(--text-muted);font-family:'DM Sans',sans-serif;font-size:13px;padding:5px 14px;cursor:pointer;transition:all .15s}
+.fbtn:hover{border-color:var(--gold);color:var(--text)}
+.fbtn.ativo{background:#2a220a;border-color:var(--gold);color:var(--gold)}
+.search{background:var(--dark3);border:1px solid #333;border-radius:20px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:5px 14px;outline:none;width:200px}
+.search:focus{border-color:var(--gold)}
+.search::placeholder{color:var(--text-dim)}
+.content{max-width:1100px;margin:0 auto;padding:.5rem 1.5rem 3rem}
+.tab-panel{display:none}.tab-panel.ativo{display:block}
+.hotel-section{margin-bottom:1.5rem}
+.hotel-header{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1rem;background:var(--dark3);border-radius:var(--radius-sm);margin-bottom:8px;cursor:pointer;border:1px solid #2a2a2a}
+.hotel-header:hover{border-color:#383838}
+.hotel-nome{font-size:15px;font-weight:500}
+.hotel-meta{font-size:12px;color:var(--text-muted);margin-top:2px}
+.hotel-badges{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.badge{font-size:11px;font-weight:500;padding:3px 9px;border-radius:20px}
+.badge-pendente{background:#2a1a0a;color:#e8a040}
+.badge-pago{background:#0a2a15;color:var(--green)}
+.btn-lista{background:transparent;border:1px solid var(--gold);color:var(--gold);font-family:'DM Sans',sans-serif;font-size:12px;padding:4px 12px;border-radius:20px;cursor:pointer;transition:all .15s}
+.btn-lista:hover{background:var(--gold);color:#111}
+.pedido{background:var(--dark2);border:1px solid #222;border-radius:var(--radius);padding:1rem 1.1rem;margin-bottom:8px}
+.pedido-codigo{font-size:11px;color:var(--gold);font-weight:500;letter-spacing:.06em;margin-bottom:4px}
+.pedido-nome{font-size:15px;font-weight:500}
+.pedido-meta{font-size:12px;color:var(--text-muted);margin-top:2px}
+.pedido-header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.pedido-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;flex-shrink:0}
+.apto-wrap{display:flex;align-items:center;gap:6px}
+.apto-label{font-size:12px;color:var(--text-muted)}
+.apto-input{background:var(--dark3);border:1px solid #333;border-radius:var(--radius-sm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:4px 10px;width:90px;outline:none}
+.apto-input:focus{border-color:var(--gold)}
+.apto-input.preenchido{border-color:#2a4a2a;color:var(--green)}
+.btn-save{background:transparent;border:1px solid #444;color:var(--text-muted);font-family:'DM Sans',sans-serif;font-size:12px;padding:4px 10px;border-radius:var(--radius-sm);cursor:pointer}
+.btn-save:hover{border-color:var(--gold);color:var(--gold)}
+.toggle-pago{display:flex;align-items:center;gap:7px;cursor:pointer;user-select:none}
+.toggle-pago input{display:none}
+.toggle-track{width:36px;height:20px;background:#333;border-radius:10px;position:relative;transition:background .2s;flex-shrink:0}
+.toggle-track::after{content:'';position:absolute;top:3px;left:3px;width:14px;height:14px;background:#666;border-radius:50%;transition:all .2s}
+.toggle-pago input:checked~.toggle-track{background:var(--green-dark)}
+.toggle-pago input:checked~.toggle-track::after{left:19px;background:var(--green)}
+.toggle-label{font-size:12px;color:var(--text-muted)}
+.toggle-pago input:checked~.toggle-label{color:var(--green)}
+.pedido-itens{margin-top:.75rem;padding-top:.75rem;border-top:1px solid #1e1e1e;display:flex;flex-wrap:wrap;gap:6px}
+.item-pill{font-size:12px;color:var(--text-muted);background:var(--dark3);border:1px solid #2a2a2a;border-radius:20px;padding:3px 10px}
+.pedido-total{font-size:13px;font-weight:500;color:var(--gold);margin-top:8px}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;align-items:center;justify-content:center;padding:1rem}
+.modal-overlay.open{display:flex}
+.modal{background:var(--dark2);border:1px solid #2a2a2a;border-radius:var(--radius);padding:1.5rem;max-width:500px;width:100%;max-height:85vh;overflow-y:auto}
+.modal h2{font-family:'Playfair Display',serif;font-size:18px;font-weight:500;margin-bottom:4px}
+.modal-sub{font-size:12px;color:var(--text-muted);margin-bottom:1.25rem}
+.entrega-item{display:flex;gap:10px;padding:.75rem 0;border-bottom:1px solid #1e1e1e}
+.entrega-item:last-child{border-bottom:none}
+.entrega-apto{font-size:13px;font-weight:500;color:var(--gold);min-width:70px}
+.entrega-detalhe{font-size:13px;color:var(--text-muted);line-height:1.6}
+.entrega-nome{font-size:12px;color:var(--text-dim);margin-top:2px}
+.modal-footer{display:flex;gap:8px;margin-top:1.25rem}
+.btn-fechar{flex:1;background:transparent;border:1px solid #444;color:var(--text-muted);font-family:'DM Sans',sans-serif;font-size:13px;padding:10px;border-radius:var(--radius-sm);cursor:pointer}
+.btn-copiar{flex:1;background:var(--gold);border:none;color:#111;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;padding:10px;border-radius:var(--radius-sm);cursor:pointer}
+.vazio{text-align:center;padding:3rem 1rem;color:var(--text-dim);font-size:14px}
+.vazio-icon{font-size:40px;margin-bottom:.75rem}
+
+/* ── CUSTOS ── */
+.sec-title{font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:14px;margin-top:1.5rem}
+.sec-title:first-child{margin-top:0}
+.custo-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;margin-bottom:1rem}
+.custo-card{background:var(--dark2);border:1px solid #222;border-radius:var(--radius);padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.custo-nome{font-size:14px;font-weight:500}
+.custo-venda{font-size:12px;color:var(--text-muted);margin-top:2px}
+.custo-margem{font-size:12px;font-weight:500;margin-top:4px}
+.custo-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.custo-label{font-size:12px;color:var(--text-muted)}
+.custo-input{background:var(--dark3);border:1px solid #333;border-radius:var(--radius-sm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;padding:6px 10px;width:80px;outline:none;text-align:right}
+.custo-input:focus{border-color:var(--gold)}
+.info-box{background:var(--dark3);border-radius:var(--radius-sm);padding:.625rem .875rem;font-size:12px;color:var(--text-muted);line-height:1.6;margin-bottom:1rem}
+.btn-primario{background:var(--gold);border:none;color:#111;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;padding:11px 24px;border-radius:var(--radius-sm);cursor:pointer;width:100%;margin-top:.5rem}
+.btn-primario:hover{background:#d4b050}
+.mes-select-wrap{display:flex;align-items:center;gap:10px;margin-bottom:1rem;flex-wrap:wrap}
+.mes-select{background:var(--dark3);border:1px solid #333;border-radius:var(--radius-sm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:7px 12px;outline:none}
+
+/* ── FINANCEIRO ── */
+.fin-mes-header{background:var(--dark2);border:1px solid #222;border-radius:var(--radius);padding:1.25rem 1.5rem;margin-bottom:1.25rem}
+.fin-periodo{font-size:13px;color:var(--text-muted);margin-bottom:.875rem}
+.fin-destaque{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:1.25rem}
+.fin-card{background:var(--dark3);border-radius:var(--radius-sm);padding:1rem;text-align:center}
+.fin-card-val{font-size:22px;font-weight:500;margin-bottom:4px}
+.fin-card-label{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em}
+.fin-card.vendas .fin-card-val{color:var(--blue)}
+.fin-card.custo .fin-card-val{color:#e8a040}
+.fin-card.lucro .fin-card-val{color:var(--green)}
+.hotel-fin-row{display:flex;justify-content:space-between;align-items:center;padding:.625rem 0;border-bottom:1px solid #1e1e1e;font-size:13px;flex-wrap:wrap;gap:6px}
+.hotel-fin-row:last-child{border-bottom:none}
+.hotel-fin-vals{display:flex;gap:16px;font-size:12px;flex-wrap:wrap}
+.hotel-fin-vals span{color:var(--text-muted)}
+.hotel-fin-vals strong{color:var(--gold)}
+.btn-fechar-mes{background:var(--red);border:none;color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;padding:12px 24px;border-radius:var(--radius-sm);cursor:pointer;width:100%}
+.btn-fechar-mes:hover{background:#c0392b}
+.btn-fechar-mes:disabled{background:#333;color:#555;cursor:not-allowed}
+.historico-list{display:flex;flex-direction:column;gap:8px}
+.hist-card{background:var(--dark2);border:1px solid #222;border-radius:var(--radius);overflow:hidden}
+.hist-header{display:flex;align-items:center;justify-content:space-between;padding:.875rem 1.25rem;cursor:pointer;flex-wrap:wrap;gap:8px}
+.hist-header:hover{background:var(--dark3)}
+.hist-mes{font-size:15px;font-weight:500}
+.hist-resumo{display:flex;gap:12px;font-size:12px;flex-wrap:wrap}
+.hist-resumo .v{color:var(--blue)}
+.hist-resumo .c{color:#e8a040}
+.hist-resumo .l{color:var(--green);font-weight:500}
+.hist-body{display:none;padding:1rem 1.25rem;border-top:1px solid #1e1e1e}
+.hist-body.open{display:block}
+.hist-detalhe{font-size:12px;color:var(--text-muted);padding:.375rem 0;border-bottom:1px solid #1a1a1a;line-height:1.5}
+.hist-detalhe:last-of-type{border-bottom:none}
+.hist-detalhe strong{color:var(--text)}
+.btn-excluir{background:transparent;border:1px solid var(--red);color:var(--red);font-family:'DM Sans',sans-serif;font-size:11px;padding:3px 10px;border-radius:20px;cursor:pointer;margin-top:.875rem}
+
+@media(max-width:600px){
+  .fin-destaque{grid-template-columns:1fr}
+  .tabs{padding:0 .75rem}
+  .tab{padding:.75rem .75rem;font-size:12px}
+  .content,.filtros,.stats{padding-left:1rem;padding-right:1rem}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="logo">FF</div>
+    <div><h1>Painel Admin</h1><p>Fênix Flats · Bebidas</p></div>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <button class="hbtn" onclick="renderPedidos()">↻ Atualizar</button>
+    <button class="hbtn" onclick="importarPedido()">+ Pedido manual</button>
+    <button class="hbtn" style="border-color:var(--red);color:var(--red)" onclick="limparTudo()">Limpar pedidos</button>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab ativo" onclick="trocarAba('pedidos',this)">📋 Pedidos</button>
+  <button class="tab" onclick="trocarAba('custos',this)">💰 Custos</button>
+  <button class="tab" onclick="trocarAba('financeiro',this)">📊 Financeiro</button>
+</div>
+
+<!-- ABA PEDIDOS -->
+<div id="aba-pedidos" class="tab-panel ativo">
+  <div class="stats" id="stats"></div>
+  <div class="filtros">
+    <button class="fbtn ativo" onclick="setFiltro('todos',this)">Todos</button>
+    <button class="fbtn" onclick="setFiltro('pendente',this)">Pendentes</button>
+    <button class="fbtn" onclick="setFiltro('pago',this)">Pagos</button>
+    <button class="fbtn" onclick="setFiltro('hoje',this)">Check-in hoje</button>
+    <input class="search" type="text" id="search" placeholder="Buscar nome ou código..." oninput="renderPedidos()"/>
+  </div>
+  <div class="content" id="content"></div>
+</div>
+
+<!-- ABA CUSTOS -->
+<div id="aba-custos" class="tab-panel">
+  <div class="content" style="padding-top:1.25rem">
+
+    <p class="sec-title">Custo fixo por produto</p>
+    <div class="info-box">Quanto você paga em cada produto. Usado para calcular o lucro no Financeiro.</div>
+    <div class="custo-grid" id="custo-grid"></div>
+    <button class="btn-primario" onclick="salvarCustos()">Salvar custos</button>
+
+    <p class="sec-title">Custo variável por mês</p>
+    <div class="info-box">Se num mês o custo de um produto mudou (promoção, reajuste), registre aqui. Só vale para o mês escolhido.</div>
+    <div class="mes-select-wrap">
+      <span style="font-size:13px;color:var(--text-muted)">Mês:</span>
+      <select class="mes-select" id="mes-custo-var"></select>
+      <button class="fbtn" onclick="renderCustoVar()">Carregar</button>
+    </div>
+    <div class="custo-grid" id="custo-var-grid"></div>
+    <div id="custo-var-btns" style="display:none">
+      <button class="btn-primario" onclick="salvarCustoVar()">Salvar custo deste mês</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ABA FINANCEIRO -->
+<div id="aba-financeiro" class="tab-panel">
+  <div class="content" style="padding-top:1.25rem">
+    <p class="sec-title">Mês atual</p>
+    <div id="fin-atual"></div>
+    <p class="sec-title">Histórico de meses fechados</p>
+    <div id="historico" class="historico-list"></div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="fecharModal(event)">
+  <div class="modal" id="modal"></div>
+</div>
+
+<script>
+const SCRIPT_URL='https://script.google.com/macros/s/AKfycbwZF2lzj5nKEpc6Ih1i9zHZacO0M6fTNP3UTWQLkAElmJeNPHZi_Qra-kyqpcH23G_9JA/exec';
+const HOTEIS=['Bonaparte','Comfort Suites','Comfort Taguatinga','Go Inn Taguatinga','Kubitschek Plaza','Mercure','Lets Idea','Ramada','Saint Paul Plaza','Tryp Brasília Nações'];
+const PRODUTOS_BASE=[
+  {id:'p1',nome:'Água sem gás',   venda:5},
+  {id:'p2',nome:'Água com gás',   venda:6},
+  {id:'p3',nome:'Heineken lata',  venda:8},
+  {id:'p4',nome:'Coca-Cola lata', venda:7},
+  {id:'p5',nome:'Guaraná Antarctica',venda:7},
+];
+
+let filtroAtivo='todos';
+let pedidosCache=[];
+
+function getLs(k,def=null){try{const v=localStorage.getItem(k);return v?JSON.parse(v):def;}catch{return def;}}
+function setLs(k,v){localStorage.setItem(k,JSON.stringify(v));}
+
+// ── API ──
+async function getPedidos(){
+  try{
+    const r=await fetch(SCRIPT_URL+'?action=list&t='+Date.now());
+    const d=await r.json();
+    pedidosCache=Array.isArray(d)?d:[];
+    return pedidosCache;
+  }catch{return pedidosCache;}
+}
+async function updateCampo(codigo,campo,valor){
+  try{await fetch(`${SCRIPT_URL}?action=update&codigo=${codigo}&campo=${campo}&valor=${encodeURIComponent(valor)}`);}
+  catch(e){console.error(e);}
+}
+
+// ── ABAS ──
+function trocarAba(id,btn){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('ativo'));
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('ativo'));
+  document.getElementById('aba-'+id).classList.add('ativo');
+  btn.classList.add('ativo');
+  if(id==='custos') renderCustos();
+  if(id==='financeiro') renderFinanceiro();
+}
+
+// ── PEDIDOS ──
+function setFiltro(f,btn){
+  filtroAtivo=f;
+  document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('ativo'));
+  btn.classList.add('ativo');
+  renderPedidos();
+}
+function hoje(){return new Date().toISOString().slice(0,10);}
+function filtrar(pedidos){
+  const q=(document.getElementById('search')||{}).value?.trim().toLowerCase()||'';
+  return pedidos.filter(p=>{
+    if(filtroAtivo==='pendente'&&p.pago) return false;
+    if(filtroAtivo==='pago'&&!p.pago) return false;
+    if(filtroAtivo==='hoje'&&p.checkin!==hoje()) return false;
+    if(q&&!p.nome.toLowerCase().includes(q)&&!(p.codigo||'').toLowerCase().includes(q)) return false;
+    return true;
+  });
+}
+function fmtData(s){if(!s)return'—';const[y,m,d]=s.split('-');return`${d}/${m}/${y}`;}
+function renderStats(todos){
+  if(!todos) return;
+  const pagos=todos.filter(p=>p.pago).length;
+  const pendentes=todos.filter(p=>!p.pago).length;
+  const total=todos.reduce((a,p)=>a+(p.total||0),0);
+  const totalPago=todos.filter(p=>p.pago).reduce((a,p)=>a+(p.total||0),0);
+  document.getElementById('stats').innerHTML=`
+    <div class="stat"><div class="stat-val">${todos.length}</div><div class="stat-label">Total pedidos</div></div>
+    <div class="stat"><div class="stat-val" style="color:var(--green)">${pagos}</div><div class="stat-label">Pagos</div></div>
+    <div class="stat"><div class="stat-val" style="color:#e8a040">${pendentes}</div><div class="stat-label">Pendentes</div></div>
+    <div class="stat"><div class="stat-val">R$ ${totalPago.toFixed(0)}</div><div class="stat-label">Recebido</div></div>
+    <div class="stat"><div class="stat-val" style="color:var(--text-muted)">R$ ${(total-totalPago).toFixed(0)}</div><div class="stat-label">A receber</div></div>`;
+}
+async function renderPedidos(){
+  document.getElementById('content').innerHTML='<div class="vazio"><div class="vazio-icon">⏳</div><div>Carregando...</div></div>';
+  const todos=await getPedidos();
+  renderStats(todos);
+  const visiveis=filtrar(todos);
+  const content=document.getElementById('content');
+  if(!visiveis.length){content.innerHTML='<div class="vazio"><div class="vazio-icon">📋</div><div>Nenhum pedido encontrado.</div></div>';return;}
+  const porHotel={};
+  HOTEIS.forEach(h=>porHotel[h]=[]);
+  porHotel['Outros']=[];
+  visiveis.forEach(p=>{if(porHotel[p.hotel]!==undefined)porHotel[p.hotel].push(p);else porHotel['Outros'].push(p);});
+  let html='';
+  [...HOTEIS,'Outros'].forEach(hotel=>{
+    const ps=porHotel[hotel];if(!ps||!ps.length)return;
+    const pagos=ps.filter(p=>p.pago).length,pendentes=ps.filter(p=>!p.pago).length;
+    const totalH=ps.reduce((a,p)=>a+(p.total||0),0);
+    const hid='h-'+hotel.replace(/\s/g,'_');
+    html+=`<div class="hotel-section">
+      <div class="hotel-header" onclick="toggleHotel('${hid}')">
+        <div><div class="hotel-nome">${hotel}</div><div class="hotel-meta">${ps.length} pedido${ps.length>1?'s':''} · R$ ${totalH.toFixed(2)}</div></div>
+        <div class="hotel-badges">
+          ${pendentes?`<span class="badge badge-pendente">${pendentes} pendente${pendentes>1?'s':''}</span>`:''}
+          ${pagos?`<span class="badge badge-pago">${pagos} pago${pagos>1?'s':''}</span>`:''}
+          <button class="btn-lista" onclick="event.stopPropagation();abrirLista('${hotel}')">Lista de entrega</button>
+        </div>
+      </div>
+      <div id="${hid}">`;
+    ps.forEach(p=>{
+      html+=`<div class="pedido" id="pedido-${p.codigo}">
+        <div class="pedido-header">
+          <div><div class="pedido-codigo">${p.codigo||'—'}</div><div class="pedido-nome">${p.nome}</div>
+            <div class="pedido-meta">Check-in: ${fmtData(p.checkin)}${p.apto?` · Apto <strong style="color:var(--gold)">${p.apto}</strong>`:' · Apto não informado'}</div></div>
+          <div class="pedido-actions">
+            <div class="apto-wrap">
+              <span class="apto-label">Apto</span>
+              <input class="apto-input${p.apto?' preenchido':''}" type="text" placeholder="Ex: 214" value="${p.apto||''}" id="apto-${p.codigo}" onkeydown="if(event.key==='Enter')salvarApto('${p.codigo}')"/>
+              <button class="btn-save" onclick="salvarApto('${p.codigo}')">OK</button>
+            </div>
+            <label class="toggle-pago">
+              <input type="checkbox" ${p.pago?'checked':''} onchange="togglePago('${p.codigo}',this.checked)"/>
+              <div class="toggle-track"></div>
+              <span class="toggle-label">${p.pago?'Pago':'Pendente'}</span>
+            </label>
+          </div>
+        </div>
+        <div class="pedido-itens">${(p.itens||[]).map(i=>`<span class="item-pill">${i.qty}× ${i.desc}</span>`).join('')}</div>
+        <div class="pedido-total">Total: R$ ${(p.total||0).toFixed(2)}</div>
+      </div>`;
+    });
+    html+=`</div></div>`;
+  });
+  content.innerHTML=html;
+}
+function toggleHotel(id){const el=document.getElementById(id);if(el)el.style.display=el.style.display==='none'?'':'none';}
+async function salvarApto(codigo){
+  const val=document.getElementById('apto-'+codigo).value.trim();
+  await updateCampo(codigo,'apto',val);
+  document.getElementById('apto-'+codigo)?.classList.toggle('preenchido',!!val);
+  renderPedidos();
+}
+async function togglePago(codigo,pago){
+  await updateCampo(codigo,'pago',pago);
+  const label=document.querySelector(`#pedido-${codigo} .toggle-label`);
+  if(label)label.textContent=pago?'Pago':'Pendente';
+  renderPedidos();
+}
+async function abrirLista(hotel){
+  const todos=await getPedidos();
+  const ps=todos.filter(p=>p.hotel===hotel);
+  if(!ps.length){alert('Nenhum pedido para este hotel.');return;}
+  const pagos=ps.filter(p=>p.pago),pendentes=ps.filter(p=>!p.pago);
+  let html=`<h2>${hotel}</h2><div class="modal-sub">Lista de entrega · ${ps.length} pedido${ps.length>1?'s':''}</div>`;
+  if(pagos.length){
+    html+=`<div style="font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--green);margin-bottom:8px">✓ Confirmar entrega (${pagos.length})</div>`;
+    pagos.forEach(p=>{html+=`<div class="entrega-item"><div class="entrega-apto">Apto ${p.apto||'?'}</div><div><div class="entrega-detalhe">${(p.itens||[]).map(i=>i.qty+'× '+i.desc).join(' · ')}</div><div class="entrega-nome">${p.nome}</div></div></div>`;});
+  }
+  if(pendentes.length){
+    html+=`<div style="font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:#e8a040;margin-top:1rem;margin-bottom:8px">⏳ Pendente (${pendentes.length})</div>`;
+    pendentes.forEach(p=>{html+=`<div class="entrega-item" style="opacity:.5"><div class="entrega-apto">Apto ${p.apto||'?'}</div><div><div class="entrega-detalhe">${(p.itens||[]).map(i=>i.qty+'× '+i.desc).join(' · ')}</div><div class="entrega-nome">${p.nome}</div></div></div>`;});
+  }
+  const txt=pagos.map(p=>`Apto ${p.apto||'?'} · ${p.nome}\n${(p.itens||[]).map(i=>i.qty+'× '+i.desc).join(', ')}`).join('\n\n');
+  html+=`<div class="modal-footer"><button class="btn-fechar" onclick="fecharModal()">Fechar</button><button class="btn-copiar" onclick="copiarLista(\`${txt.replace(/`/g,"'")}\`)">Copiar lista</button></div>`;
+  document.getElementById('modal').innerHTML=html;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function fecharModal(e){if(!e||e.target===document.getElementById('modal-overlay'))document.getElementById('modal-overlay').classList.remove('open');}
+function copiarLista(txt){navigator.clipboard.writeText(txt).then(()=>{const b=document.querySelector('.btn-copiar');b.textContent='Copiado!';setTimeout(()=>b.textContent='Copiar lista',2000);});}
+async function importarPedido(){
+  const nome=prompt('Nome na reserva:');if(!nome)return;
+  const hotelStr=prompt('Hotel (número):\n'+HOTEIS.map((h,i)=>`${i+1}. ${h}`).join('\n'));if(!hotelStr)return;
+  const hotelNome=isNaN(hotelStr)?hotelStr:HOTEIS[parseInt(hotelStr)-1];
+  const ci=prompt('Data de check-in (AAAA-MM-DD):');
+  const desc=prompt('Itens (ex: 2x Heineken, 1x Coca):');
+  const totalStr=prompt('Valor total (R$):');
+  const total=parseFloat(totalStr)||0;
+  const codigo='FF'+Date.now().toString(36).toUpperCase().slice(-5);
+  const pedido={codigo,nome,hotel:hotelNome,checkin:ci||'',obs:'Manual',itens:[{desc:desc||'—',qty:1,unit:total,sub:total}],total,criadoEm:new Date().toISOString()};
+  fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify(pedido)}).then(()=>renderPedidos());
+}
+function limparTudo(){alert('Para apagar pedidos, acesse sua planilha Google Sheets diretamente.');}
+
+// ── CUSTOS ──
+function getCustos(){return getLs('ff_custos',{});}
+function getCustosVar(){return getLs('ff_custos_var',{});}
+
+function renderCustos(){
+  const custos=getCustos();
+  document.getElementById('custo-grid').innerHTML=PRODUTOS_BASE.map(p=>{
+    const c=custos[p.id]||0;
+    const m=c>0?((p.venda-c)/p.venda*100).toFixed(0):null;
+    const mc=m>=50?'var(--green)':m>=30?'#e8a040':'var(--red)';
+    return `<div class="custo-card">
+      <div><div class="custo-nome">${p.nome}</div><div class="custo-venda">Venda: R$ ${p.venda.toFixed(2)}</div>
+        <div class="custo-margem" id="mg-${p.id}" style="color:${m!==null?mc:'var(--text-dim)'}">
+          ${m!==null?`Margem: ${m}%`:'Informe o custo'}</div></div>
+      <div class="custo-right"><span class="custo-label">Custo R$</span>
+        <input class="custo-input" type="number" step="0.01" min="0" id="custo-${p.id}" value="${c||''}" placeholder="0,00"
+          oninput="calcMargem('${p.id}',${p.venda},this.value,'mg-${p.id}')"/></div>
+    </div>`;
+  }).join('');
+
+  const sel=document.getElementById('mes-custo-var');
+  sel.innerHTML=Array.from({length:6},(_,i)=>{
+    const d=new Date();d.setMonth(d.getMonth()-i);
+    const key=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    const lbl=d.toLocaleString('pt-BR',{month:'long',year:'numeric'});
+    return `<option value="${key}">${lbl.charAt(0).toUpperCase()+lbl.slice(1)}</option>`;
+  }).join('');
+}
+
+function calcMargem(id,venda,val,elId){
+  const c=parseFloat(val)||0;
+  const el=document.getElementById(elId);
+  if(!el)return;
+  if(c>0){
+    const m=((venda-c)/venda*100).toFixed(0);
+    el.style.color=m>=50?'var(--green)':m>=30?'#e8a040':'var(--red)';
+    el.textContent=`Margem: ${m}%`;
+  }else{el.style.color='var(--text-dim)';el.textContent='Informe o custo';}
+}
+
+function salvarCustos(){
+  const c={};
+  PRODUTOS_BASE.forEach(p=>{const v=parseFloat(document.getElementById('custo-'+p.id).value)||0;if(v>0)c[p.id]=v;});
+  setLs('ff_custos',c);
+  const btn=event.target;btn.textContent='✓ Salvo!';btn.style.background='var(--green-dark)';
+  setTimeout(()=>{btn.textContent='Salvar custos';btn.style.background='';},2000);
+  renderCustos();
+}
+
+function renderCustoVar(){
+  const mes=document.getElementById('mes-custo-var').value;
+  const var_=getCustosVar()[mes]||{};
+  const fix=getCustos();
+  document.getElementById('custo-var-grid').innerHTML=PRODUTOS_BASE.map(p=>{
+    const v=var_[p.id]!==undefined?var_[p.id]:(fix[p.id]||'');
+    return `<div class="custo-card">
+      <div><div class="custo-nome">${p.nome}</div><div class="custo-venda">Custo fixo: R$ ${(fix[p.id]||0).toFixed(2)}</div></div>
+      <div class="custo-right"><span class="custo-label">Custo R$</span>
+        <input class="custo-input" type="number" step="0.01" min="0" id="cvar-${p.id}" value="${v}" placeholder="${fix[p.id]||'0'}"/></div>
+    </div>`;
+  }).join('');
+  document.getElementById('custo-var-btns').style.display='block';
+}
+
+function salvarCustoVar(){
+  const mes=document.getElementById('mes-custo-var').value;
+  const todos=getCustosVar();
+  const d={};
+  PRODUTOS_BASE.forEach(p=>{const v=parseFloat(document.getElementById('cvar-'+p.id).value);if(!isNaN(v)&&v>=0)d[p.id]=v;});
+  todos[mes]=d;setLs('ff_custos_var',todos);
+  alert('Custo do mês salvo!');
+}
+
+// ── FINANCEIRO ──
+function mesKey(){const d=new Date();return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;}
+function mesLabel(k){const[y,m]=k.split('-');const d=new Date(y,m-1,1);const l=d.toLocaleString('pt-BR',{month:'long',year:'numeric'});return l.charAt(0).toUpperCase()+l.slice(1);}
+
+function custoItem(desc,qty,mk){
+  const fix=getCustos(),var_=getCustosVar()[mk]||{};
+  const prod=PRODUTOS_BASE.find(p=>desc.toLowerCase().includes(p.nome.toLowerCase().split(' ')[0].toLowerCase()));
+  if(!prod)return 0;
+  const c=var_[prod.id]!==undefined?var_[prod.id]:(fix[prod.id]||0);
+  return c*qty;
+}
+
+function calcFin(pedidos,mk){
+  const pagos=pedidos.filter(p=>p.pago);
+  let vendas=0,custo=0;
+  const porHotel={};
+  pagos.forEach(p=>{
+    vendas+=(p.total||0);
+    let cp=0;(p.itens||[]).forEach(i=>{cp+=custoItem(i.desc,i.qty,mk);});
+    custo+=cp;
+    if(!porHotel[p.hotel])porHotel[p.hotel]={vendas:0,custo:0,qtd:0};
+    porHotel[p.hotel].vendas+=(p.total||0);
+    porHotel[p.hotel].custo+=cp;
+    porHotel[p.hotel].qtd++;
+  });
+  return{vendas,custo,lucro:vendas-custo,total:pedidos.length,pagos:pagos.length,porHotel};
+}
+
+function htmlCards(f){
+  return`<div class="fin-destaque">
+    <div class="fin-card vendas"><div class="fin-card-val">R$ ${f.vendas.toFixed(2)}</div><div class="fin-card-label">Total vendido</div></div>
+    <div class="fin-card custo"><div class="fin-card-val">R$ ${f.custo.toFixed(2)}</div><div class="fin-card-label">Custo estimado</div></div>
+    <div class="fin-card lucro"><div class="fin-card-val">R$ ${f.lucro.toFixed(2)}</div><div class="fin-card-label">Lucro estimado</div></div>
+  </div>`;
+}
+
+function htmlHoteis(ph){
+  const rows=Object.entries(ph).filter(([,v])=>v.qtd>0).sort((a,b)=>b[1].vendas-a[1].vendas);
+  if(!rows.length)return'<div style="font-size:13px;color:var(--text-dim);padding:.5rem 0">Nenhuma venda ainda.</div>';
+  return rows.map(([hotel,v])=>`
+    <div class="hotel-fin-row">
+      <span>${hotel} <span style="color:var(--text-dim);font-size:11px">(${v.qtd})</span></span>
+      <div class="hotel-fin-vals">
+        <span>Vendas: <strong>R$ ${v.vendas.toFixed(2)}</strong></span>
+        <span>Lucro: <strong style="color:var(--green)">R$ ${(v.vendas-v.custo).toFixed(2)}</strong></span>
+      </div>
+    </div>`).join('');
+}
+
+async function renderFinanceiro(){
+  const todos=await getPedidos();
+  const mk=mesKey();
+  const f=calcFin(todos,mk);
+  const temCustos=Object.keys(getCustos()).length>0;
+  document.getElementById('fin-atual').innerHTML=`
+    <div class="fin-mes-header">
+      <div class="fin-periodo">${mesLabel(mk)} · ${f.pagos} pedido${f.pagos!==1?'s':''} pago${f.pagos!==1?'s':''} de ${f.total} total</div>
+      ${!temCustos?`<div class="info-box">⚠️ Cadastre os custos na aba <strong>Custos</strong> para ver o lucro real.</div>`:''}
+      ${htmlCards(f)}
+      <div style="font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;font-weight:500;margin:.875rem 0 .5rem">Por hotel</div>
+      ${htmlHoteis(f.porHotel)}
+      <div style="margin-top:1.25rem">
+        <button class="btn-fechar-mes" onclick="fecharMes()" ${f.pagos===0?'disabled':''}>Fechar mês e zerar pedidos</button>
+        <div style="font-size:11px;color:var(--text-dim);margin-top:8px;text-align:center">O relatório é salvo no histórico antes de zerar.</div>
+      </div>
+    </div>`;
+  renderHistorico();
+}
+
+async function fecharMes(){
+  if(!confirm(`Fechar ${mesLabel(mesKey())}?\n\nO relatório será salvo e os pedidos zerados.\nEssa ação não pode ser desfeita.`))return;
+  const todos=await getPedidos();
+  const mk=mesKey();
+  const f=calcFin(todos,mk);
+  const hist=getLs('ff_historico',[]);
+  hist.unshift({mesKey:mk,mesLabel:mesLabel(mk),fechadoEm:new Date().toISOString(),...f,pedidos:todos});
+  setLs('ff_historico',hist);
+  try{
+    await fetch(`${SCRIPT_URL}?action=zerarPedidos`);
+    pedidosCache=[];
+  }catch{
+    alert('Relatório salvo!\nNão consegui zerar a planilha automaticamente — apague os pedidos manualmente no Google Sheets.');
+  }
+  renderFinanceiro();
+  renderPedidos();
+  alert(`✓ ${mesLabel(mk)} fechado e salvo no histórico!`);
+}
+
+function renderHistorico(){
+  const hist=getLs('ff_historico',[]);
+  const el=document.getElementById('historico');
+  if(!hist.length){el.innerHTML='<div class="vazio"><div class="vazio-icon">📅</div><div>Nenhum mês fechado ainda.</div></div>';return;}
+  el.innerHTML=hist.map((h,i)=>`
+    <div class="hist-card">
+      <div class="hist-header" onclick="document.getElementById('hb${i}').classList.toggle('open')">
+        <div><div class="hist-mes">${h.mesLabel}</div>
+          <div style="font-size:11px;color:var(--text-dim);margin-top:2px">${h.pagos} pedidos · fechado em ${new Date(h.fechadoEm).toLocaleDateString('pt-BR')}</div></div>
+        <div class="hist-resumo">
+          <span>Vendas: <span class="v">R$ ${h.vendas.toFixed(2)}</span></span>
+          <span>Custo: <span class="c">R$ ${h.custo.toFixed(2)}</span></span>
+          <span>Lucro: <span class="l">R$ ${h.lucro.toFixed(2)}</span></span>
+        </div>
+      </div>
+      <div class="hist-body" id="hb${i}">
+        ${htmlCards(h)}
+        <div style="font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;font-weight:500;margin:.875rem 0 .5rem">Por hotel</div>
+        ${htmlHoteis(h.porHotel)}
+        <div style="margin-top:.875rem;font-size:12px;color:var(--text-muted);margin-bottom:.5rem">${h.pedidos.length} pedidos registrados</div>
+        ${(h.pedidos||[]).map(p=>`<div class="hist-detalhe">
+          <strong>${p.nome}</strong> · ${p.hotel}${p.apto?' · Apto '+p.apto:''} · 
+          ${(p.itens||[]).map(i=>i.qty+'× '+i.desc).join(', ')} · 
+          <span style="color:var(--gold)">R$ ${(p.total||0).toFixed(2)}</span> · 
+          ${p.pago?'<span style="color:var(--green)">Pago</span>':'<span style="color:#e8a040">Pendente</span>'}
+        </div>`).join('')}
+        <button class="btn-excluir" onclick="excluirHist(${i})">Excluir relatório</button>
+      </div>
+    </div>`).join('');
+}
+
+function excluirHist(i){
+  if(!confirm('Excluir este relatório do histórico?'))return;
+  const hist=getLs('ff_historico',[]);hist.splice(i,1);setLs('ff_historico',hist);renderHistorico();
+}
+
+// ── INIT ──
+document.getElementById('content').innerHTML='<div class="vazio"><div class="vazio-icon">⏳</div><div>Carregando pedidos...</div></div>';
+renderPedidos();
+</script>
+</body>
+</html>
