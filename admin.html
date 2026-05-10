@@ -151,6 +151,23 @@ body{background:var(--dark);color:var(--text);font-family:'DM Sans',sans-serif;f
 </head>
 <body>
 
+<!-- TELA DE LOGIN -->
+<div id="login-screen" style="position:fixed;inset:0;background:#0f0f0f;display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column;gap:1.5rem;">
+  <div style="text-align:center;margin-bottom:.5rem">
+    <div style="width:56px;height:56px;border-radius:8px;background:#C9A84C;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:20px;font-weight:500;color:#111;margin:0 auto 1rem">FF</div>
+    <div style="font-family:'Playfair Display',serif;font-size:22px;color:#f0ead8">Fênix Flats</div>
+    <div style="font-size:13px;color:#9a9080;margin-top:4px">Painel administrativo</div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:10px;width:280px">
+    <input type="password" id="senha-input" placeholder="Digite a senha"
+      style="background:#1a1a1a;border:1px solid #333;border-radius:8px;color:#f0ead8;font-family:'DM Sans',sans-serif;font-size:15px;padding:12px 16px;outline:none;text-align:center;letter-spacing:.2em"
+      onkeydown="if(event.key==='Enter')verificarSenha()"/>
+    <button onclick="verificarSenha()" style="background:#C9A84C;border:none;border-radius:8px;color:#111;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;padding:12px;cursor:pointer">Entrar</button>
+    <div id="senha-erro" style="font-size:12px;color:#e74c3c;text-align:center;display:none">Senha incorreta. Tente novamente.</div>
+  </div>
+</div>
+<div id="admin-content" style="display:none">
+
 <div class="header">
   <div class="header-left">
     <div class="logo">FF</div>
@@ -592,9 +609,33 @@ function excluirHist(i){
   const hist=getLs('ff_historico',[]);hist.splice(i,1);setLs('ff_historico',hist);renderHistorico();
 }
 
+
+// ── SENHA ──
+const SENHA = 'thaurosbr1234'; // ← TROQUE AQUI pela sua senha
+
+function verificarSenha(){
+  const input = document.getElementById('senha-input').value;
+  if(input === SENHA){
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('admin-content').style.display='block';
+    sessionStorage.setItem('ff_auth','1');
+  } else {
+    document.getElementById('senha-erro').style.display='block';
+    document.getElementById('senha-input').value='';
+    document.getElementById('senha-input').focus();
+  }
+}
+
+// Verificar se já está autenticado nesta sessão
+if(sessionStorage.getItem('ff_auth')==='1'){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('admin-content').style.display='block';
+}
+
 // ── INIT ──
 document.getElementById('content').innerHTML='<div class="vazio"><div class="vazio-icon">⏳</div><div>Carregando pedidos...</div></div>';
 renderPedidos();
 </script>
+</div>
 </body>
 </html>
