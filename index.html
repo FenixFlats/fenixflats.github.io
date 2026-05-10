@@ -466,7 +466,9 @@ function enviar(){
 
   // Salvar no Google Sheets via Apps Script
   const pedido={codigo,nome,hotel,checkin:ci,obs,itens,total,criadoEm:new Date().toISOString()};
-  fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify(pedido)}).catch(()=>{});
+  // Envia via imagem (contorna restrição de CORS/redirect do Google Apps Script)
+  const url=SCRIPT_URL+'?action=salvar&dados='+encodeURIComponent(JSON.stringify(pedido));
+  new Image().src=url;
 
   // Montar mensagem WhatsApp
   const linhas=itens.map(i=>(i.desc.startsWith('Combo')?'🎁 ':'• ')+i.qty+'× '+i.desc+' — R$ '+i.sub.toFixed(2));
