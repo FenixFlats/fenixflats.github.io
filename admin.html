@@ -140,6 +140,11 @@ body{background:var(--dark);color:var(--text);font-family:'DM Sans',sans-serif;f
 .hist-detalhe:last-of-type{border-bottom:none}
 .hist-detalhe strong{color:var(--text)}
 .btn-excluir{background:transparent;border:1px solid var(--red);color:var(--red);font-family:'DM Sans',sans-serif;font-size:11px;padding:3px 10px;border-radius:20px;cursor:pointer;margin-top:.875rem}
+.pedido-check{width:18px;height:18px;accent-color:var(--red);cursor:pointer;flex-shrink:0;margin-top:3px}
+.btn-apagar-sel{background:var(--red);border:none;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;padding:8px 18px;border-radius:var(--radius-sm);cursor:pointer;display:none}
+.btn-apagar-sel.visivel{display:inline-block}
+.sel-info{font-size:13px;color:var(--text-muted);display:none}
+.sel-info.visivel{display:inline}
 
 @media(max-width:600px){
   .fin-destaque{grid-template-columns:1fr}
@@ -195,6 +200,8 @@ body{background:var(--dark);color:var(--text);font-family:'DM Sans',sans-serif;f
     <button class="fbtn" onclick="setFiltro('pago',this)">Pagos</button>
     <button class="fbtn" onclick="setFiltro('hoje',this)">Check-in hoje</button>
     <input class="search" type="text" id="search" placeholder="Buscar nome ou código..." oninput="renderPedidos()"/>
+    <span class="sel-info" id="sel-info">0 selecionados</span>
+    <button class="btn-apagar-sel" id="btn-apagar-sel" onclick="apagarSelecionados()">🗑 Apagar selecionados</button>
   </div>
   <div class="content" id="content"></div>
 </div>
@@ -341,8 +348,10 @@ async function renderPedidos(){
     ps.forEach(p=>{
       html+=`<div class="pedido" id="pedido-${p.codigo}">
         <div class="pedido-header">
+          <div style="display:flex;gap:10px;align-items:flex-start">
+          ${!p.pago?`<input type="checkbox" class="pedido-check" id="chk-${p.codigo}" onchange="atualizarSelecao()"/>`:'<div style="width:18px"></div>'}
           <div><div class="pedido-codigo">${p.codigo||'—'}</div><div class="pedido-nome">${p.nome}</div>
-            <div class="pedido-meta">Check-in: ${fmtData(p.checkin)}${p.apto?` · Apto <strong style="color:var(--gold)">${p.apto}</strong>`:' · Apto não informado'}</div></div>
+            <div class="pedido-meta">Check-in: ${fmtData(p.checkin)}${p.apto?` · Apto <strong style="color:var(--gold)">${p.apto}</strong>`:' · Apto não informado'}</div></div></div>
           <div class="pedido-actions">
             <div class="apto-wrap">
               <span class="apto-label">Apto</span>
@@ -367,15 +376,31 @@ async function renderPedidos(){
 function toggleHotel(id){const el=document.getElementById(id);if(el)el.style.display=el.style.display==='none'?'':'none';}
 async function salvarApto(codigo){
   const val=document.getElementById('apto-'+codigo).value.trim();
+  const btn=document.querySelector(`#pedido-${codigo} .btn-save`);
+  if(btn){btn.textContent='...';btn.style.opacity='.5';}
   await updateCampo(codigo,'apto',val);
-  document.getElementById('apto-'+codigo)?.classList.toggle('preenchido',!!val);
-  renderPedidos();
+  const inp=document.getElementById('apto-'+codigo);
+  if(inp){inp.classList.toggle('preenchido',!!val);}
+  if(btn){btn.textContent='✓';btn.style.color='var(--green)';setTimeout(()=>{btn.textContent='OK';btn.style.color='';btn.style.opacity='';},1500);}
+  // Atualizar meta sem reload
+  const meta=document.querySelector(`#pedido-${codigo} .pedido-meta`);
+  if(meta&&val){const ci=meta.textContent.split('·')[0].trim();meta.innerHTML=ci+` · Apto <strong style="color:var(--gold)">${val}</strong>`;}
 }
 async function togglePago(codigo,pago){
-  await updateCampo(codigo,'pago',pago);
+  // Atualiza visual imediatamente
   const label=document.querySelector(`#pedido-${codigo} .toggle-label`);
   if(label)label.textContent=pago?'Pago':'Pendente';
-  renderPedidos();
+  const chk=document.getElementById('chk-'+codigo);
+  if(pago&&chk){
+    // Pago: remove checkbox (não pode apagar pago)
+    chk.parentElement.innerHTML='<div style="width:18px"></div>';
+    atualizarSelecao();
+  }
+  // Envia para o servidor
+  await updateCampo(codigo,'pago',pago);
+  // Atualiza stats sem reload completo
+  const todos=await getPedidos();
+  renderStats(todos);
 }
 async function abrirLista(hotel){
   const todos=await getPedidos();
@@ -630,6 +655,38 @@ function verificarSenha(){
 if(sessionStorage.getItem('ff_auth')==='1'){
   document.getElementById('login-screen').style.display='none';
   document.getElementById('admin-content').style.display='block';
+}
+
+// ── SELEÇÃO E APAGAR ──
+function atualizarSelecao(){
+  const checks=document.querySelectorAll('.pedido-check:checked');
+  const total=document.querySelectorAll('.pedido-check');
+  const info=document.getElementById('sel-info');
+  const btn=document.getElementById('btn-apagar-sel');
+  if(checks.length>0){
+    info.textContent=checks.length+' selecionado'+(checks.length>1?'s':'');
+    info.classList.add('visivel');
+    btn.classList.add('visivel');
+  } else {
+    info.classList.remove('visivel');
+    btn.classList.remove('visivel');
+  }
+}
+
+async function apagarSelecionados(){
+  const checks=document.querySelectorAll('.pedido-check:checked');
+  if(!checks.length) return;
+  const codigos=Array.from(checks).map(c=>c.id.replace('chk-',''));
+  if(!confirm(`Apagar ${codigos.length} pedido${codigos.length>1?'s':''}? Essa ação não pode ser desfeita.`)) return;
+  // Apagar um por um
+  for(const codigo of codigos){
+    await fetch(`${SCRIPT_URL}?action=apagar&codigo=${codigo}`).catch(()=>{});
+    document.getElementById('pedido-'+codigo)?.remove();
+  }
+  // Atualiza stats
+  const todos=await getPedidos();
+  renderStats(todos);
+  atualizarSelecao();
 }
 
 // ── INIT ──
